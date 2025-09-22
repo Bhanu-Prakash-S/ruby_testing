@@ -70,34 +70,65 @@ describe MagicSeven do
   # Write a test for each of the following methods:
 
   describe '#subtract_four' do
+    context "when the previous value is 6" do
+      it 'return 2' do
+                previous = 6
+                result = game.subtract_four(previous)
+                expect(result).to eq 2
+      end    
+    end
   end
 
   describe '#divide_by_two' do
+    context 'when the previous value is 10' do
+            it 'returns 5' do
+                previous = 10
+                result = game.divide_by_two(previous)
+                expect(result).to eq 5
+            end
+    end
   end
 
   # The following tests will need you to create new instances of MagicSeven with
   # a specific value for the random_number.
   describe '#subtract_random_number' do
+    let(:nums) { MagicSeven.new(8) }
+    context 'when the previous value is 32 and random number is 8' do
+            it 'returns 24' do
+              previous = 32
+              result = nums.subtract_random_number(previous)
+              expect(result).to eq 24                     
+            end
+    end
   end
 
   # The #play method will always return seven! Test this game, using any
   # integer as the random_number. Update the context with the number.
   describe '#play' do
-    context 'when the random number is ...' do
+    context 'when the random number is 14' do
+    let(:nums) { MagicSeven.new(14) }
       # remove the 'x' before running this test
-      xit 'will return 7' do
+      it 'will return 7' do
+        result = nums.play
+        expect(result).to eq 7
       end
     end
-
-    context 'when the random number is ...' do
+    
+    context 'when the random number is 142' do
+    let(:nums) { MagicSeven.new(142) }
       # remove the 'x' before running this test
-      xit 'will return 7' do
+      it 'will return 7' do
+        result = nums.play
+        expect(result).to eq 7
       end
     end
-
-    context 'when the random number is ...' do
+    
+    context 'when the random number is 140' do
+    let(:nums) { MagicSeven.new(140) }
       # remove the 'x' before running this test
-      xit 'will return 7' do
+      it 'will return 7' do
+        result = nums.play
+        expect(result).to eq 7
       end
     end
   end

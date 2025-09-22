@@ -118,29 +118,46 @@ describe BinaryGame do
         game_input.player_input(min, max)
       end
     end
-
+    
     # ASSIGNMENT #1
-
+    
     # Write a test for the following two context blocks. You will need to
     # provide 1-2 invalid inputs (letters, symbols, or numbers that are not
     # between the min & max integers) and one valid input number (as a string).
-
+    
     # Remember that a stub can be called multiple times and return different values.
     # https://rspec.info/features/3-12/rspec-mocks/configuring-responses/returning-a-value/
-
+    
     context 'when user inputs an incorrect value once, then a valid input' do
       before do
+        letter = 'a'
+        valid_input = '3'
+        allow(game_input).to receive(:gets).and_return(letter, valid_input)
       end
-
-      xit 'completes loop and displays error message once' do
+      
+      it 'completes loop and displays error message once' do
+        min = game_input.instance_variable_get(:@minimum)
+        max = game_input.instance_variable_get(:@maximum)
+        error_message = "Input error! Please enter a number between #{min} or #{max}."
+        expect(game_input).to receive(:puts).with(error_message).once
+        game_input.player_input(min, max)
       end
     end
-
+    
     context 'when user inputs two incorrect values, then a valid input' do
       before do
+          letter2 = 'a'
+          letter1 = 'a2'
+          valid_input = '3'
+          allow(game_input).to receive(:gets).and_return(letter1, letter2, valid_input)
       end
 
-      xit 'completes loop and displays error message twice' do
+      it 'completes loop and displays error message twice' do
+          min = game_input.instance_variable_get(:@minimum)
+          max = game_input.instance_variable_get(:@maximum)
+          error_message = "Input error! Please enter a number between #{min} or #{max}."
+          expect(game_input).to receive(:puts).with(error_message).exactly(2).times
+          game_input.player_input(min, max)
       end
     end
   end
@@ -152,16 +169,26 @@ describe BinaryGame do
   describe '#verify_input' do
     # Located inside #player_input (Looping Script Method)
     # Query Method -> Test the return value
-
-    # NOTE: #verify_input will only return a number if it is between?(min, max)
+    subject(:game) { described_class.new(1, 20) }
+    let(:game_min) { game.instance_variable_get(:@minimum) }
+    let(:game_max) { game.instance_variable_get(:@maximum) }
+     # NOTE: #verify_input will only return a number if it is between?(min, max)
 
     context 'when given a valid input as argument' do
-      xit 'returns valid input' do
+      it 'returns valid input' do
+        valid_input = 7
+        solution = game.verify_input(game_min, game_max, valid_input)
+
+        expect(solution).to eql valid_input
       end
     end
 
     context 'when given invalid input as argument' do
-      xit 'returns nil' do
+      it 'returns nil' do
+        invalid_input = 55
+        solution = game.verify_input(game_min, game_max, invalid_input)
+
+        expect(solution).to eql nil        
       end
     end
   end
@@ -253,7 +280,10 @@ describe BinaryGame do
 
     # Write a test for the following context.
     context 'when game minimum and maximum is 100 and 600' do
-      xit 'returns 9' do
+      subject (:game_600) { described_class.new(100, 600) }
+      it 'returns 9' do
+            max = game_600.maximum_guesses
+            expect(max).to eq 9
       end
     end
   end
@@ -311,7 +341,13 @@ describe BinaryGame do
 
     # Write a test for the following context.
     context 'when game_over? is false five times' do
-      xit 'calls display_turn_order five times' do
+      before do
+        allow(search_display).to receive(:game_over?).and_return(false, false, false, false, false, true)
+      end
+
+      it 'calls display_turn_order five times' do
+        expect(game_display).to receive(:display_turn_order).with(search_display).exactly(5).times
+        game_display.display_binary_search(search_display)
       end
     end
   end
@@ -319,31 +355,44 @@ describe BinaryGame do
   # ASSIGNMENT #5
 
   # Write three tests for the following method.
+  # This method is both a Command Method and a Script Method. It changes the
+  # observable state by incrementing the instance variable @guess_count by one,
+  # sends two command messages #make_guess and #update_range to the object
+  # binary_search of class BinarySearch, and sends one command message to `self`
+  #  by calling #display_guess.
+  
+  # Create a new subject and an instance_double for BinarySearch.
   describe '#display_turn_order' do
-    # This method is both a Command Method and a Script Method. It changes the
-    # observable state by incrementing the instance variable @guess_count by one,
-    # sends two command messages #make_guess and #update_range to the object
-    # binary_search of class BinarySearch, and sends one command message to `self`
-    #  by calling #display_guess.
 
-    # Create a new subject and an instance_double for BinarySearch.
+    subject(:game) { described_class.new(1, 10) }
+    let(:bs) { instance_double(BinarySearch) }
 
     before do
       # You'll need to create a few method stubs.
+      
+      allow(bs).to receive(:make_guess)
+      allow(bs).to receive(:update_range)
+      allow(game).to receive(:display_guess)
     end
 
     # Command Method -> Test the change in the observable state
-    xit 'increases guess_count by one' do
+    it 'increases guess_count by one' do
+      expect{ game.display_turn_order(bs) }.to change { game.instance_variable_get(:@guess_count) }.by(1) 
     end
 
     # Method with Outgoing Command -> Test that a message is sent
-    xit 'sends make_guess' do
+    it 'sends make_guess' do
+      expect(bs).to receive(:make_guess)
+      game.display_turn_order(bs)
     end
 
     # Method with Outgoing Command -> Test that a message is sent
-    xit 'sends update_range' do
+    it 'sends update_range' do
+      expect(bs).to receive(:update_range)
+      game.display_turn_order(bs)
     end
 
+  end
     # Using method expectations can be confusing. Stubbing the methods above
     # does not cause this test to pass; it only 'allows' a method to be
     # called, if it is called.
@@ -360,7 +409,6 @@ describe BinaryGame do
     # and rerun the tests. The test for the method that you commented out will
     # fail because the method is never called. Now, uncomment the line & resave
     # the file to have all tests passing.
-  end
 
   describe '#introduction' do
     # Located inside #play_game (Public Script Method)
